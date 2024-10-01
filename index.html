@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>エントリシートワークシート</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    label, textarea, select {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    select, textarea {
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+    }
+    textarea {
+        resize: vertical;
+    }
+    #charCount, #totalCharCount {
+        font-size: 12px;
+        color: #555;
+        text-align: right;
+    }
+    button {
+        width: 100%;
+        padding: 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    p {
+        font-weight: bold;
+        color: #333;
+        margin: 10px 0;
+    }
+    @media (max-width: 600px) {
+        .container {
+            padding: 15px;
+        }
+        button {
+            padding: 12px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>エントリシートワークシート</h1>
+
+    <label for="selectItem">項目を選択してください:</label>
+    <select id="selectItem">
+        <option value="">--選択してください--</option>
+        <option value="activities">学生時代に取り組んだこと</option>
+        <option value="selfPR">自己PR</option>
+        <option value="motivation">志望動機</option>
+        <option value="axis">就職活動の軸</option>
+        <option value="strengthWeakness">長所と短所</option>
+        <option value="desiredIndustry">希望する業界とその理由</option>
+        <option value="desiredJob">希望する職種とその理由</option>
+    </select>
+
+    <div id="questionArea"></div>
+
+    <button id="saveButton">保存</button>
+
+    <p id="totalCharCount">合計文字数: 0</p>
+</div>
+
+<script>
+var questions = {
+    'activities': [
+        '具体的な内容: 学生時代に取り組んだ活動やプロジェクトについて具体的に教えてください。',
+        '理由や背景: その活動に取り組んだ理由や背景を教えてください。',
+        '自分の役割: あなたの役割と果たした役割について教えてください。',
+        '成果や結果: その活動を通じて達成した成果や結果を教えてください。',
+        '学んだことや得たスキル: その活動を通じて学んだことや得たスキルを教えてください。',
+        '成長: それが自身の成長にどうつながったか教えてください。'
+    ],
+    'selfPR': [
+        '強みや特徴: あなたの強みや特徴について教えてください。',
+        '具体的なエピソード: その強みが発揮された具体的なエピソードを教えてください。',
+        '役立つ点: その強みがどのように役立つか教えてください。',
+        '入社後の貢献: 入社後にその強みをどのように活かして貢献できるか教えてください。',
+        'まとめ: まとめとして、自分の強みを簡潔に振り返ってください。'
+    ],
+    'motivation': [
+        '興味を持った理由: 企業や業界に興味を持った理由を教えてください。',
+        '企業を選んだ理由: その企業を選んだ理由を具体的に教えてください。',
+        'キャリア目標と企業の一致点: 自分のキャリア目標と企業の一致点について教えてください。',
+        '強みの関連性: 企業の強みや特徴と自分の強みや特徴の関連性について教えてください。',
+        '入社後の貢献: 入社後にどう貢献できるか教えてください。'
+    ],
+    'axis': [
+        '就職活動の軸: あなたの就職活動において重視していることは何ですか？',
+        '理由: その軸を重視する理由を教えてください。',
+        '企業選びの基準: その軸に基づいて企業を選ぶ際の基準を教えてください。',
+        '具体的なエピソード: その軸に関連する具体的なエピソードを教えてください。',
+        '成長への影響: その軸があなたの成長にどのように影響するか教えてください。',
+        'まとめ: まとめとして、その軸があなたにとってどれほど重要かを簡潔に述べてください。'
+    ],
+    'strengthWeakness': [
+        '長所: あなたの長所について教えてください。',
+        '具体的なエピソード（長所）: その長所が発揮された具体的なエピソードを教えてください。',
+        '短所: あなたの短所について教えてください。',
+        '具体的なエピソード（短所）: その短所が表れた具体的なエピソードを教えてください。',
+        '改善への取り組み: 短所を克服するためにどのような取り組みをしているか教えてください。',
+        'まとめ: まとめとして、あなたの長所と短所について簡潔に述べてください。'
+    ],
+    'desiredIndustry': [
+        '希望する業界: あなたが希望する業界について教えてください。',
+        '理由: なぜその業界を希望するのか理由を教えてください。',
+        '業界の魅力: その業界のどのような点に魅力を感じるか教えてください。',
+        '業界での目標: その業界で達成したい目標を教えてください。',
+        '具体的なエピソード: その業界に関連する具体的なエピソードを教えてください。',
+        'まとめ: まとめとして、その業界で働くことの意義を簡潔に述べてください。'
+    ],
+    'desiredJob': [
+        '希望する職種: あなたが希望する職種について教えてください。',
+        '理由: なぜその職種を希望するのか理由を教えてください。',
+        '職種の魅力: その職種のどのような点に魅力を感じるか教えてください。',
+        '職種での目標: その職種で達成したい目標を教えてください。',
+        '具体的なエピソード: その職種に関連する具体的なエピソードを教えてください。',
+        'まとめ: まとめとして、その職種で働くことの意義を簡潔に述べてください。'
+    ]
+};
+
+var examples = {
+    'activities': '私が学生時代に取り組んだ活動は、大学のテニスサークルでのリーダーシップの発揮です。サークル内のメンバー間のコミュニケーション不足が原因で、練習や試合のパフォーマンスが低下していることに気付きました。そこで、私はチームのキャプテンに立候補し、週に一度のミーティングを開催することを提案しました。各メンバーが自由に意見を交換できる場を設けることで、メンバー間の信頼関係が強まり、結果としてサークル全体のパフォーマンスが向上しました。この経験を通じて、リーダーシップやコミュニケーションスキルの重要性を学びました。また、集団をまとめる力も向上しました。',
+    'selfPR': '私の強みは、問題解決能力です。例えば、大学時代に取り組んだプロジェクトで、チームメンバーとの意見の対立がありました。私は各メンバーの意見を公平に聞き、妥協点を見つけることで、全員が納得する解決策を導き出しました。この経験から、調整能力やコミュニケーションスキルを身につけました。この強みを活かし、貴社でも様々な課題を解決し、チームの目標達成に貢献したいと考えています。',
+    'motivation': '私が貴社に興味を持った理由は、業界のリーダーとしての地位と革新性にあります。特に、貴社の新規事業開発における積極的な取り組みには強い関心を抱きました。私のキャリア目標は、新しい技術やサービスを通じて社会に貢献することです。貴社の事業戦略と私の目標は一致しており、入社後はその革新力を活かして新規事業の推進に貢献したいと考えています。',
+    'axis': '私の就職活動の軸は「成長機会の多さ」です。なぜなら、自己成長を通じて企業にも貢献できると考えているからです。企業選びの際には、成長を支援する制度や文化が整っているかを重視しています。例えば、インターンシップ先での成長機会が豊富だった経験から、その重要性を強く実感しました。この軸に基づき、貴社の成長支援制度に非常に魅力を感じています。',
+    'strengthWeakness': '私の長所は責任感の強さです。大学時代にクラス代表を務め、様々なイベントを成功させるために尽力しました。一方、短所は完璧主義であることです。プロジェクトの細部にこだわりすぎてしまい、全体の進行が遅れることがあります。しかし、優先順位を明確にすることでこの短所を克服しています。',
+    'desiredIndustry': '私が希望する業界はIT業界です。その理由は、常に技術革新が起こり続け、多様な成長機会があるからです。特にAIやデータサイエンスの分野に魅力を感じています。IT業界での目標は、データ解析を通じて新たな価値を創造し、社会に貢献することです。大学での研究プロジェクトでデータ分析に取り組んだ経験が、私の志望動機を強く後押ししています。',
+    'desiredJob': '私が希望する職種はプロジェクトマネージャーです。その理由は、チームをまとめ、プロジェクトを成功に導く役割にやりがいを感じるからです。プロジェクトマネージャーとして、計画立案から実行、進捗管理まで一貫して関われる点に魅力を感じます。大学のサークル活動でプロジェクトをリードした経験が、この職種への志望を確固たるものにしました。'
+};
+
+document.getElementById('selectItem').addEventListener('change', function() {
+    var selected = this.value;
+    var questionArea = document.getElementById('questionArea');
+    questionArea.innerHTML = '';
+
+    if (selected) {
+        var exampleText = document.createElement('p');
+        exampleText.textContent = 'サンプル文例: ' + examples[selected];
+        questionArea.appendChild(exampleText);
+
+        questions[selected].forEach(function(question, index) {
+            var questionLabel = document.createElement('label');
+            questionLabel.textContent = question;
+            questionArea.appendChild(questionLabel);
+
+            var textarea = document.createElement('textarea');
+            textarea.rows = 4;
+            textarea.dataset.question = index;
+            textarea.addEventListener('input', updateCharCount);
+            questionArea.appendChild(textarea);
+        });
+    }
+});
+
+function updateCharCount() {
+    var totalCharCount = 0;
+    var textareas = document.querySelectorAll('#questionArea textarea');
+    textareas.forEach(function(textarea) {
+        totalCharCount += textarea.value.length;
+    });
+    document.getElementById('totalCharCount').textContent = '合計文字数: ' + totalCharCount;
+}
+
+document.getElementById('saveButton').addEventListener('click', function() {
+    var selected = document.getElementById('selectItem').value;
+    if (!selected) {
+        alert('項目を選択してください。');
+        return;
+    }
+
+    var data = 'サンプル文例: ' + examples[selected] + '\n\n';
+    var textareas = document.querySelectorAll('#questionArea textarea');
+    textareas.forEach(function(textarea, index) {
+        data += questions[selected][index] + '\n' + textarea.value + '\n\n';
+    });
+    data += '合計文字数: ' + document.getElementById('totalCharCount').textContent.split(': ')[1] + '\n';
+
+    var blob = new Blob([data], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = selected + '_回答.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
