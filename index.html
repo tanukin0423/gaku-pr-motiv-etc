@@ -202,7 +202,7 @@ document.getElementById('saveButton').addEventListener('click', function() {
         return;
     }
 
-    var data = 'サンプル文例: ' + examples[selected] + '\n\n';
+    var data = '';
     var textareas = document.querySelectorAll('#questionArea textarea');
     textareas.forEach(function(textarea, index) {
         data += questions[selected][index] + '\n' + textarea.value + '\n\n';
