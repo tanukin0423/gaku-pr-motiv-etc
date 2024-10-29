@@ -1,83 +1,94 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>エントリシートワークシート</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-    }
-    .container {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: white;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-    }
-    h1 {
-        text-align: center;
-        color: #333;
-    }
-    label, textarea, select {
-        display: block;
-        width: 100%;
-        margin-bottom: 15px;
-    }
-    select, textarea {
-        padding: 10px;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-        box-sizing: border-box;
-    }
-    textarea {
-        resize: vertical;
-    }
-    #charCount, #totalCharCount {
-        font-size: 12px;
-        color: #555;
-        text-align: right;
-    }
-    button {
-        width: 100%;
-        padding: 15px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-    button:hover {
-        background-color: #0056b3;
-    }
-    p {
-        font-weight: bold;
-        color: #333;
-        margin: 10px 0;
-    }
-    @media (max-width: 600px) {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エントリーシート作成支援ツール</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f7f7f7ec;
+            color: #333;
+        }
         .container {
-            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        label, p {
+            margin-top: 10px;
+            display: block;
+        }
+        textarea {
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #fff;
         }
         button {
-            padding: 12px;
+            background: #4CAF50;
+            color: #fff;
+            cursor: pointer;
         }
-    }
-</style>
+        button:hover {
+            background: #45a049;
+        }
+        #totalCharCount {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .example-container {
+            margin-bottom: 20px;
+        }
+        .example {
+            background: #f0f0f0;
+            padding: 10px;
+            border-left: 5px solid #4CAF50;
+            margin-bottom: 10px;
+        }
+        .example strong {
+            font-weight: bold;
+        }
+       
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            textarea {
+                font-size: 14px;
+            }
+            select, button {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
-
 <div class="container">
-    <h1>エントリシートワークシート</h1>
+    <h1>エントリーシート作成支援ツール</h1>
 
     <label for="selectItem">項目を選択してください:</label>
     <select id="selectItem">
         <option value="">--選択してください--</option>
+        <option value="academics">学業・ゼミで取り組んだこと</option>
         <option value="activities">学生時代に取り組んだこと</option>
         <option value="selfPR">自己PR</option>
         <option value="motivation">志望動機</option>
@@ -88,102 +99,138 @@
     </select>
 
     <div id="questionArea"></div>
-
-    <button id="saveButton">保存</button>
-
     <p id="totalCharCount">合計文字数: 0</p>
+    <button id="saveButton">保存</button>
 </div>
 
 <script>
-var questions = {
+const questions = {
     'activities': [
-        '具体的な内容: 学生時代に取り組んだ活動やプロジェクトについて具体的に教えてください。',
-        '理由や背景: その活動に取り組んだ理由や背景を教えてください。',
-        '自分の役割: あなたの役割と果たした役割について教えてください。',
-        '成果や結果: その活動を通じて達成した成果や結果を教えてください。',
-        '学んだことや得たスキル: その活動を通じて学んだことや得たスキルを教えてください。',
-        '成長: それが自身の成長にどうつながったか教えてください。'
+        '1. 取り組んだ活動やプロジェクトの具体的な内容',
+        '2. 取り組んだ理由や背景',
+        '3. 自分の役割と果たした役割',
+        '4. 達成した成果や結果',
+        '5. 学んだことや得たスキル',
+        '6. それが自身の成長にどうつながったか'
     ],
     'selfPR': [
-        '強みや特徴: あなたの強みや特徴について教えてください。',
-        '具体的なエピソード: その強みが発揮された具体的なエピソードを教えてください。',
-        '役立つ点: その強みがどのように役立つか教えてください。',
-        '入社後の貢献: 入社後にその強みをどのように活かして貢献できるか教えてください。',
-        'まとめ: まとめとして、自分の強みを簡潔に振り返ってください。'
+        '1. 自分の強みや特徴',
+        '2. 強みが発揮された具体的なエピソード',
+        '3. その強みがどのように役立つか',
+        '4. 入社後の貢献予測'
     ],
     'motivation': [
-        '興味を持った理由: 企業や業界に興味を持った理由を教えてください。',
-        '企業を選んだ理由: その企業を選んだ理由を具体的に教えてください。',
-        'キャリア目標と企業の一致点: 自分のキャリア目標と企業の一致点について教えてください。',
-        '強みの関連性: 企業の強みや特徴と自分の強みや特徴の関連性について教えてください。',
-        '入社後の貢献: 入社後にどう貢献できるか教えてください。'
+        '1. 企業や業界に興味を持った理由',
+        '2. その企業を選んだ理由',
+        '3. 自分のキャリア目標と企業の一致点',
+        '4. 入社後にどう貢献できるか'
     ],
     'axis': [
-        '就職活動の軸: あなたの就職活動において重視していることは何ですか？',
-        '理由: その軸を重視する理由を教えてください。',
-        '企業選びの基準: その軸に基づいて企業を選ぶ際の基準を教えてください。',
-        '具体的なエピソード: その軸に関連する具体的なエピソードを教えてください。',
-        '成長への影響: その軸があなたの成長にどのように影響するか教えてください。',
-        'まとめ: まとめとして、その軸があなたにとってどれほど重要かを簡潔に述べてください。'
+        '1. 就職活動の軸',
+        '2. その軸を選んだ理由',
+        '3. その軸が企業選びにどう影響したか',
+        '4. その軸を通じてどのように成長したいか'
     ],
     'strengthWeakness': [
-        '長所: あなたの長所について教えてください。',
-        '具体的なエピソード（長所）: その長所が発揮された具体的なエピソードを教えてください。',
-        '短所: あなたの短所について教えてください。',
-        '具体的なエピソード（短所）: その短所が表れた具体的なエピソードを教えてください。',
-        '改善への取り組み: 短所を克服するためにどのような取り組みをしているか教えてください。',
-        'まとめ: まとめとして、あなたの長所と短所について簡潔に述べてください。'
+        '1. あなたの長所',
+        '2. 長所が発揮された具体的なエピソード',
+        '3. あなたの短所',
+        '4. 短所を克服するために努力していること'
     ],
     'desiredIndustry': [
-        '希望する業界: あなたが希望する業界について教えてください。',
-        '理由: なぜその業界を希望するのか理由を教えてください。',
-        '業界の魅力: その業界のどのような点に魅力を感じるか教えてください。',
-        '業界での目標: その業界で達成したい目標を教えてください。',
-        '具体的なエピソード: その業界に関連する具体的なエピソードを教えてください。',
-        'まとめ: まとめとして、その業界で働くことの意義を簡潔に述べてください。'
+        '1. 希望する業界',
+        '2. その業界を希望する理由',
+        '3. その業界で達成したい目標',
+        '4. その業界で必要なスキルと自身の適性'
     ],
     'desiredJob': [
-        '希望する職種: あなたが希望する職種について教えてください。',
-        '理由: なぜその職種を希望するのか理由を教えてください。',
-        '職種の魅力: その職種のどのような点に魅力を感じるか教えてください。',
-        '職種での目標: その職種で達成したい目標を教えてください。',
-        '具体的なエピソード: その職種に関連する具体的なエピソードを教えてください。',
-        'まとめ: まとめとして、その職種で働くことの意義を簡潔に述べてください。'
+        '1. 希望する職種',
+        '2. その職種を希望する理由',
+        '3. その職種で達成したい目標',
+        '4. その職種で必要なスキルと自身の適性'
+    ],
+    'academics': [
+        '1. 学業やゼミで取り組んだ具体的な内容',
+        '2. その取り組みを始めた理由や背景',
+        '3. 取り組みの過程で直面した課題',
+        '4. 課題に対する解決策と結果',
+        '5. 学んだことや得たスキル',
+        '6. それが自身の成長にどうつながったか'
     ]
 };
 
-var examples = {
-    'activities': '私が学生時代に取り組んだ活動は、大学のテニスサークルでのリーダーシップの発揮です。サークル内のメンバー間のコミュニケーション不足が原因で、練習や試合のパフォーマンスが低下していることに気付きました。そこで、私はチームのキャプテンに立候補し、週に一度のミーティングを開催することを提案しました。各メンバーが自由に意見を交換できる場を設けることで、メンバー間の信頼関係が強まり、結果としてサークル全体のパフォーマンスが向上しました。この経験を通じて、リーダーシップやコミュニケーションスキルの重要性を学びました。また、集団をまとめる力も向上しました。',
-    'selfPR': '私の強みは、問題解決能力です。例えば、大学時代に取り組んだプロジェクトで、チームメンバーとの意見の対立がありました。私は各メンバーの意見を公平に聞き、妥協点を見つけることで、全員が納得する解決策を導き出しました。この経験から、調整能力やコミュニケーションスキルを身につけました。この強みを活かし、貴社でも様々な課題を解決し、チームの目標達成に貢献したいと考えています。',
-    'motivation': '私が貴社に興味を持った理由は、業界のリーダーとしての地位と革新性にあります。特に、貴社の新規事業開発における積極的な取り組みには強い関心を抱きました。私のキャリア目標は、新しい技術やサービスを通じて社会に貢献することです。貴社の事業戦略と私の目標は一致しており、入社後はその革新力を活かして新規事業の推進に貢献したいと考えています。',
-    'axis': '私の就職活動の軸は「成長機会の多さ」です。なぜなら、自己成長を通じて企業にも貢献できると考えているからです。企業選びの際には、成長を支援する制度や文化が整っているかを重視しています。例えば、インターンシップ先での成長機会が豊富だった経験から、その重要性を強く実感しました。この軸に基づき、貴社の成長支援制度に非常に魅力を感じています。',
-    'strengthWeakness': '私の長所は責任感の強さです。大学時代にクラス代表を務め、様々なイベントを成功させるために尽力しました。一方、短所は完璧主義であることです。プロジェクトの細部にこだわりすぎてしまい、全体の進行が遅れることがあります。しかし、優先順位を明確にすることでこの短所を克服しています。',
-    'desiredIndustry': '私が希望する業界はIT業界です。その理由は、常に技術革新が起こり続け、多様な成長機会があるからです。特にAIやデータサイエンスの分野に魅力を感じています。IT業界での目標は、データ解析を通じて新たな価値を創造し、社会に貢献することです。大学での研究プロジェクトでデータ分析に取り組んだ経験が、私の志望動機を強く後押ししています。',
-    'desiredJob': '私が希望する職種はプロジェクトマネージャーです。その理由は、チームをまとめ、プロジェクトを成功に導く役割にやりがいを感じるからです。プロジェクトマネージャーとして、計画立案から実行、進捗管理まで一貫して関われる点に魅力を感じます。大学のサークル活動でプロジェクトをリードした経験が、この職種への志望を確固たるものにしました。'
+const examples = {
+  'activities': [
+    '1. 大学のサッカーサークルでキャプテンとしてチームを率いた経験があります。\n2. サークルは当初、練習の参加率が低く、試合でも結果を出せていませんでした。\n3. 私は問題点を分析し、メンバーとのコミュニケーションを重視することにしました。具体的には、毎週ミーティングを開き、各メンバーの意見を聞きながら練習メニューを改善しました。\n4. その結果、練習の参加率が向上し、試合でも連勝することができました。\n5. この経験を通じて、リーダーシップとチームビルディングの重要性を学びました。\n6. また、この経験は私自身の成長にもつながり、今後の人生においても大いに役立つと考えています。',
+    '1. 学生団体で地域イベントの企画・運営を担当しました。\n2. 地域の活性化と学生の社会貢献意識を高めるためにこのプロジェクトを選びました。\n3. 私は企画リーダーとして、イベント内容の立案やスポンサー企業との交渉を行いました。\n4. イベントは成功し、参加者数が目標を上回り、地域住民と学生の交流が深まりました。\n5. この経験から、企画力とコミュニケーションスキルを向上させることができました。\n6. このスキルは、将来の職場でも役立つと確信しています。',
+    '1. 私は大学3年次に、環境保護NPOでボランティア活動に参加しました。\n2. 環境問題に関心があり、実際にフィールドで活動したいと考えたからです。\n3. 主に地域の河川清掃活動のコーディネーターとして、月に1回の清掃イベントの企画と運営を担当しました。\n4. 1年間の活動で、参加者数を当初の平均20名から50名に増やすことができました。また、地域の小学校と連携し、環境教育プログラムも3回実施しました。\n5. この経験から、イベント運営のスキルやステークホルダーとの調整能力を身につけました。\n6. また、環境問題に対する理解が深まり、将来はこの分野でキャリアを築きたいと考えるようになりました。',
+    '1. 大学2年次から、英語ディベートサークルに所属し、全国大会に出場しました。\n2. 国際的な視野を広げ、論理的思考力を鍛えたいと考えたからです。\n3. チームのキャプテンとして、週3回の練習セッションを組織し、チームメンバーの個別指導も行いました。\n4. その結果、全国大会で準優勝を果たし、個人でもベストスピーカー賞を受賞しました。\n5. この活動を通じて、英語力はもちろん、論理的思考力、リーダーシップ、そしてプレッシャーの中でも冷静に対応する能力を身につけました。\n6. これらのスキルは、グローバルなビジネス環境で働く上で非常に有用だと考えています。',
+    '1. 大学3年次に、6ヶ月間のテクノロジー企業でのインターンシップに参加しました。\n2. 実際のビジネス環境でITスキルを活かし、業界の動向を学びたいと考えたからです。\n3. ウェブアプリケーション開発チームの一員として、新機能の設計と実装を担当しました。具体的には、ユーザーインターフェースの改善とパフォーマンス最適化に取り組みました。\n4. 結果として、担当した機能のユーザー満足度が15%向上し、ページ読み込み時間を30%短縮することができました。また、この成果が評価され、卒業後の正社員としての内定を獲得しました。\n5. この経験を通じて、実務レベルのプログラミングスキルとチーム開発の進め方を学びました。\n6. また、テクノロジー業界でのキャリアに対する確信が深まり、継続的な学習の重要性を実感しました。',
+    '1. 大学2年次から3年次にかけて、新素材開発に関する研究プロジェクトに参加しました。\n2. 化学の知識を実際の製品開発に活かし、環境に配慮した技術革新に貢献したいと考えたからです。\n3. 主に、生分解性プラスチックの強度向上に関する実験と数値解析を担当しました。週に20時間以上を研究に費やし、50回以上の実験を行いました。\n4. その結果、従来比で強度が40%向上し、コストを15%削減できる新しい配合方法を発見しました。この成果を基に、国内学会で発表を行い、優秀発表賞を受賞しました。\n5. この経験から、科学的思考力、根気強さ、そしてチームでの研究の進め方を学びました。\n6. また、研究成果が実社会に与えるインパクトを実感し、今後もイノベーションに携わりたいという思いが強くなりました。'
+    ],
+    'selfPR': [
+        '1. 私の強みは、粘り強さと計画力です。\n2. 大学時代、プログラミングのゼミで難解な課題に取り組みました。最初は全く解けずに苦労しましたが、毎日コツコツと問題を分析し、解決策を模索しました。その過程で、効率的な勉強計画を立て、仲間と情報共有をしながら問題を解決しました。\n3. 結果的に、ゼミ内で最高評価を得ることができました。\n4. この経験から得た計画力と粘り強さを活かし、貴社のプロジェクトでも確実に成果を出したいと考えています。',
+        '1. 私の強みは、チームワークとリーダーシップです。\n2. 学生時代、ボランティアサークルでイベントのリーダーを務めました。メンバーが多様な意見を持つ中で、全員が納得できる方向性を見つけるために何度も話し合いを重ねました。その結果、イベントは大成功を収め、多くの参加者から高い評価を得ました。\n3. チームの意見を尊重しながら、全員が力を発揮できる環境を作ることができました。\n4. この経験を通じて培ったリーダーシップとチームワークは、貴社でのプロジェクト推進にも大いに役立つと確信しています。'
+    ],
+    'motivation': [
+        '1. 私が貴社に興味を持った理由は、常に新しい技術に挑戦し続ける姿勢に共感したからです。\n2. 貴社の最新プロジェクトである○○に特に惹かれました。私もその一員として新しい価値を創造したいと考えています。\n3. 私のキャリア目標は、技術を駆使して社会に貢献することです。貴社のビジョンと一致していると感じました。\n4. 入社後は、自身の技術力を最大限に活かし、プロジェクトを成功に導くことで貴社に貢献したいと考えています。',
+        '1. 私がこの業界を志望する理由は、社会に大きなインパクトを与えることができるからです。\n2. 貴社を選んだ理由は、優れた技術力と革新性を持ち、業界をリードしているからです。\n3. 私のキャリア目標は、技術革新を通じて新しい市場を開拓することです。貴社の方向性と一致していると確信しています。\n4. 入社後は、自身のスキルを磨き、チームと協力しながら貴社の成長に寄与したいと考えています。'
+    ],
+    'axis': [
+        '1. 私の就職活動の軸は「社会貢献」です。\n2. 社会に対してポジティブな影響を与える企業で働きたいと考えています。\n3. この軸に基づき、貴社を選びました。貴社の事業内容が私の価値観と一致しているからです。\n4. この軸を通じて、自分のスキルや知識を常にアップデートし続けることが重要だと考えているからです。',
+        '1. 私の就職活動の軸は「成長機会」です。\n2. 自身が成長できる環境で働きたいと考えています。\n3. 成長機会が豊富な環境であれば、自身のキャリアを高めることができ、より大きな貢献ができると信じています。\n4. この軸を通じて、専門性を高め、企業の成長に貢献したいと考えています。'
+    ],
+    'strengthWeakness': [
+        '1. 私の長所はコミュニケーション能力です。\n2. 大学のグループプロジェクトで、メンバー間の意見調整役を務めました。全員が納得する解決策を見つけ、プロジェクトを成功に導きました。\n3. 私の短所は完璧主義なところです。\n4. 完璧を追求しすぎて時間がかかることがあるため、効率性を意識して優先順位をつける訓練をしています。',
+        '1. 私の長所は計画力です。\n2. 学生時代に多くのイベントを企画・運営してきましたが、事前に詳細な計画を立てることで成功率を高めました。\n3. 私の短所は慎重すぎるところです。\n4. 慎重さが裏目に出て行動が遅れることがあるため、迅速に判断し行動する習慣をつけるよう心がけています。'
+    ],
+    'desiredIndustry': [
+        '1. 私が希望する業界はIT業界です。\n2. IT業界の革新性と成長性に魅力を感じるからです。\n3. この業界で、自身の技術力を活かして新しいサービスを創出し、多くの人々の生活を豊かにしたいと考えています。\n4. 私は大学でプログラミングとデータ解析のスキルを培っており、それらを活かしてこの業界で貢献できると考えています。',
+        '1. 私が希望する業界は環境保護業界です。\n2. 環境問題に対する関心が高まり、この分野で社会に貢献したいと考えています。\n3. この業界で、環境保護に貢献する製品やサービスを開発することを目指しています。\n4. 大学で環境科学を学び、関連するインターンシップで実践的な経験を積んできました。これらの知識と経験を活かし、この業界で貢献したいと考えています。',
+        '1. 私が希望する業界は商社です。\n2. グローバルな事業展開と、幅広い分野での活躍に魅力を感じています。\n3. この業界で、国際的な取引を通じて経済発展に貢献し、自身のキャリアも成長させたいと考えています。\n4. 大学での経済学の学びや、海外留学経験を活かし、多様な文化や商習慣に適応しながら、新たなビジネス機会を創出したいと考えています。'
+    ],
+    'desiredJob': [
+        '1. 私が希望する職種はデータサイエンティストです。\n2. データを分析し、そこから得られる知見をもとに問題を解決することに興味があるからです。\n3. この職種での目標は、ビッグデータを活用して企業の意思決定を支援することです。\n4. 大学での研究で培ったデータ解析のスキルと、問題解決能力を活かし、貴社で活躍したいと考えています。',
+        '1. 私が希望する職種はプロジェクトマネージャーです。\n2. プロジェクトを管理し、チームを導くことにやりがいを感じるからです。\n3. この職種での目標は、効率的なプロジェクト運営を通じて、企業の成長に貢献することです。\n4. 大学でのリーダー経験と、インターンシップでのプロジェクト管理経験を活かし、貴社でプロジェクトを成功に導きたいと考えています。',
+        '1. 私が希望する職種は営業職です。\n2. お客様のニーズを理解し、最適なソリューションを提案することにやりがいを感じるからです。\n3. この職種での目標は、顧客満足度を高めながら、企業の売上に貢献することです。\n4. 大学時代のアルバイトでの接客経験や、コミュニケーション能力を活かし、貴社の営業部門で成果を上げたいと考えています。',
+        '1. 私が希望する職種は事務職です。\n2. 正確かつ効率的な業務遂行を通じて、組織全体の生産性向上に貢献したいと考えるからです。\n3. この職種での目標は、業務プロセスの最適化と、部門間の円滑なコミュニケーション促進です。\n4. 大学でのグループワークやアルバイトでの経験で培った、細やかな気配りと正確性を活かし、貴社の事務部門で貢献したいと考えています。'
+    ],
+    'academics': [
+        '1. 大学のゼミで「地域経済の活性化」をテーマに研究を行いました。\n2. このテーマを選んだ理由は、地元の経済発展に寄与したいという思いからです。\n3. 研究を進める中で、地域住民の協力を得ることが難しく、データ収集に苦労しました。\n4. そこで、地域イベントを開催し、住民の意見を集めることにしました。その結果、多くの有益なデータを得ることができ、研究に活かすことができました。\n5. この経験を通じて、問題解決能力とチームワークの重要性を学びました。\n6. また、データ分析のスキルも向上し、今後のキャリアに大いに役立つと感じています。',
+        '1. 大学での卒業研究として「AIによる医療データ解析」をテーマに取り組みました。\n2. 医療分野でのAI活用に興味があり、このテーマを選びました。\n3. 研究の過程で、大量のデータを処理し、正確な結果を導くことの難しさを痛感しました。\n4. しかし、試行錯誤を重ねることで、精度の高いモデルを構築することができました。\n5. この経験から、粘り強さと技術的なスキルを向上させることができました。\n6. 将来は、この経験を活かして医療分野でのデータ解析に貢献したいと考えています。'
+    ]
 };
 
 document.getElementById('selectItem').addEventListener('change', function() {
     var selected = this.value;
     var questionArea = document.getElementById('questionArea');
     questionArea.innerHTML = '';
-
-    if (selected) {
-        var exampleText = document.createElement('p');
-        exampleText.textContent = 'サンプル文例: ' + examples[selected];
-        questionArea.appendChild(exampleText);
-
+    if (selected && questions[selected]) {
+        var exampleContainer = document.createElement('div');
+        exampleContainer.className = 'example-container';
+        examples[selected].forEach(function(example, index) {
+            var exampleDiv = document.createElement('div');
+            exampleDiv.className = 'example';
+            var title = document.createElement('strong');
+            title.textContent = 'サンプル文例' + (index + 1) + ':';
+            exampleDiv.appendChild(title);
+            exampleDiv.appendChild(document.createElement('br'));
+            exampleDiv.appendChild(document.createTextNode(example));
+            exampleContainer.appendChild(exampleDiv);
+        });
+        questionArea.appendChild(exampleContainer);
         questions[selected].forEach(function(question, index) {
-            var questionLabel = document.createElement('label');
-            questionLabel.textContent = question;
-            questionArea.appendChild(questionLabel);
-
+            var label = document.createElement('label');
+            label.textContent = question;
             var textarea = document.createElement('textarea');
             textarea.rows = 4;
             textarea.dataset.question = index;
             textarea.addEventListener('input', updateCharCount);
+            questionArea.appendChild(label);
             questionArea.appendChild(textarea);
         });
     }
+    updateTotalCharCount();
 });
 
 function updateCharCount() {
@@ -195,29 +242,32 @@ function updateCharCount() {
     document.getElementById('totalCharCount').textContent = '合計文字数: ' + totalCharCount;
 }
 
+function updateTotalCharCount() {
+    var totalCharCount = 0;
+    var textareas = document.querySelectorAll('#questionArea textarea');
+    textareas.forEach(function(textarea) {
+        totalCharCount += textarea.value.length;
+    });
+    document.getElementById('totalCharCount').textContent = '合計文字数: ' + totalCharCount;
+}
+
 document.getElementById('saveButton').addEventListener('click', function() {
     var selected = document.getElementById('selectItem').value;
-    if (!selected) {
-        alert('項目を選択してください。');
-        return;
-    }
+    if (!selected) return;
 
-    var data = '';
     var textareas = document.querySelectorAll('#questionArea textarea');
-    textareas.forEach(function(textarea, index) {
-        data += questions[selected][index] + '\n' + textarea.value + '\n\n';
+    var content = '';
+    textareas.forEach(function(textarea) {
+        content += questions[selected][textarea.dataset.question] + '\n' + textarea.value + '\n\n';
     });
-    data += '合計文字数: ' + document.getElementById('totalCharCount').textContent.split(': ')[1] + '\n';
 
-    var blob = new Blob([data], { type: 'text/plain' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = selected + '_回答.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    var totalCharCount = document.getElementById('totalCharCount').textContent;
+
+    var blob = new Blob([content + '\n' + totalCharCount], { type: 'text/plain' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = selected + '_entry_sheet.txt';
+    link.click();
 });
 </script>
 </body>
